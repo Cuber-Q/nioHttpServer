@@ -77,6 +77,9 @@ public class Request {
 		paramters.put(key, value);
 	}
 	public void setParamters(Map<String, String>map){
+		if(null == paramters){
+			paramters = new HashMap<>();
+		}
 		paramters.putAll(map);
 	}
 	public String getParamters(String key){

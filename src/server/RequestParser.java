@@ -21,22 +21,22 @@ public class RequestParser {
 	public static Request parseRequest(ChannelIo cio) 
 			throws BadRequestExcecption{
 		Request request = new Request();
+		
 		//decode
 		cio.requestBuffer.flip();
 		String reqStr = decode(cio.getReadBuffer());
 		System.out.println("source request = ");
 		System.out.println(reqStr);
+		
 		//split startLine, header and body
 		String[] startLine = splitStartLine(reqStr);
+
+		//construct request obj
 		request.setMethod(startLine[0]);
 		request.setUrl(startLine[1]);
 		request.setHttpVersion(startLine[2]);
-		
-		//construct request obj
 		request.setHeaders(createHeaderMap(reqStr));
-		if(hasRequestBody(reqStr)){
-			request.setParamters(createParamtersMap(reqStr));
-		}
+		request.setParamters(createParamtersMap(startLine[1],reqStr));
 		return request;
 	}
 	
@@ -44,6 +44,7 @@ public class RequestParser {
 		return charSet.decode(bb).toString();
 	}
 	
+	//从原始信息中切分出起始行
 	private static String[] splitStartLine(String reqStr) 
 			throws BadRequestExcecption{
 		//POST /post HTTP/1.1
@@ -56,6 +57,7 @@ public class RequestParser {
 		return result;
 	}
 	
+	//封装头部信息
 	private static Map<String, String> createHeaderMap(String reqStr)
 			throws BadRequestExcecption{
 		checkRequest(reqStr);
@@ -65,9 +67,7 @@ public class RequestParser {
 		Map<String, String> headerMap = new HashMap<>();
 		for(String line : headerLines){
 			String[] header = line.split("\\"+HEADER_SEPRATOR);
-			String key = header[0];
-			String value = header[1].trim();
-			headerMap.put(key, value);
+			headerMap.put(header[0], header[1].trim());
 		}
 		return headerMap;
 	}
@@ -87,6 +87,7 @@ public class RequestParser {
 	 * @return
 	 * @throws BadRequestExcecption
 	 */
+	//从原始请求报文中切分出头部信息
 	private static String[] getHeadersLines(String reqStr)
 		throws BadRequestExcecption{
 		checkRequest(reqStr);
@@ -115,12 +116,35 @@ public class RequestParser {
 		return false;
 	}
 	
-	private static Map<String, String> createParamtersMap(String reqStr) {
-		// TODO Auto-generated method stub
-		return null;
+	//封装请求参数
+	private static Map<String, String> createParamtersMap(String url
+														,String reqStr) {
+		//从请求url中切分出参数
+		Map<String, String> paramMap = new HashMap<>();
+		int paramIndex = url.indexOf("?");
+		if(paramIndex != -1){
+			paramStr2Map(url,paramIndex,url.length()-1,paramMap);
+		}
+		//从请求消息体中切出参数
+		if(hasRequestBody(reqStr)){
+			int start = reqStr.indexOf(SECTION_END)+SECTION_END.length();
+			paramStr2Map(reqStr,start,reqStr.length(),paramMap);
+		}
+		return paramMap;
 	}
 	
-	public static void main(String[] args){
+	private static void paramStr2Map(String paramStr
+				,int start,int end,Map<String, String> paramMap){
+		paramStr = paramStr.substring(start,end);
+		String[] paramArr = paramStr.split("\\&");
+		for(String paramPair : paramArr){
+			String[] pair = paramPair.split("\\=");
+			if(pair.length != 2){
+				continue;
+			}
+			paramMap.put(pair[0].trim(),pair[1].trim());
+		}
 		
 	}
+	
 }
