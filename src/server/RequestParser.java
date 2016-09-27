@@ -121,9 +121,9 @@ public class RequestParser {
 														,String reqStr) {
 		//从请求url中切分出参数
 		Map<String, String> paramMap = new HashMap<>();
-		int paramIndex = url.indexOf("?");
-		if(paramIndex != -1){
-			paramStr2Map(url,paramIndex,url.length()-1,paramMap);
+		int paramIndex = url.indexOf("?")+1;
+		if(paramIndex != 0){
+			paramStr2Map(url,paramIndex,url.length(),paramMap);
 		}
 		//从请求消息体中切出参数
 		if(hasRequestBody(reqStr)){
