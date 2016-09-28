@@ -5,7 +5,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
 public class Response implements Sendable{
-	private static String content = "ok, i got you"; 
+	private static String content = "<html><header></header><body><h1>ok, i got u</h1></body></html>"; 
 	private ByteBuffer buffer = null;
 	private static Charset charSet = Charset.forName("utf-8");
 	private static String CRLF = "\r\n";
