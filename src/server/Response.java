@@ -9,6 +9,19 @@ public class Response implements Sendable{
 	private ByteBuffer buffer = null;
 	private static Charset charSet = Charset.forName("utf-8");
 	private static String CRLF = "\r\n";
+	private int code;
+	
+	static enum CODE{
+		OK(200),
+		NOT_FOUND(404);
+		private int code;
+		private CODE(int code){
+			this.code = code;
+		}
+		public int getCode(){
+			return this.code;
+		}
+	}
 	public Response(){
 		
 	}

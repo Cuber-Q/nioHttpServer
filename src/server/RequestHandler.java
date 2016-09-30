@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 
+import backend.BackendDispacther;
 import exception.BadRequestExcecption;
 /**
  * 负责接收http请求和发送http响应
@@ -12,8 +13,8 @@ import exception.BadRequestExcecption;
  */
 public class RequestHandler implements Handler{
 	private ChannelIo cio;
-	private Request request;
-	private Response response;
+	private Request request = null;
+	private Response response = null;
 	private boolean sent=false;//是否已发送response
 	
 	public RequestHandler(ChannelIo cio) throws Exception{
@@ -35,7 +36,7 @@ public class RequestHandler implements Handler{
 					
 					//deliver the request to backend handler
 					//todo
-					
+					BackendDispacther.dispacth(request, response);
 					//prepare to build response
 					buildResponse();
 					//prepare to send response
