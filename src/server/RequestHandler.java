@@ -45,6 +45,7 @@ public class RequestHandler implements Handler{
 			} catch (BadRequestExcecption e) {
 				// TODO: handle exception
 				close();
+				key.cancel();
 			} catch (ClosedChannelException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

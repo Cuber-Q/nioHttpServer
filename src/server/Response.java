@@ -4,24 +4,30 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
+import server.content.Content;
+
 public class Response implements Sendable{
 	private static String content = "<html><header></header><body><h1>ok, i got u</h1></body></html>"; 
 	private ByteBuffer buffer = null;
 	private static Charset charSet = Charset.forName("utf-8");
 	private static String CRLF = "\r\n";
 	private int code;
+	private boolean headOnly = false;
+	private Content body;	//	response body
 	
 	static enum CODE{
 		OK(200),
 		NOT_FOUND(404);
+		
 		private int code;
-		private CODE(int code){
+		private CODE(int code){	
 			this.code = code;
 		}
 		public int getCode(){
 			return this.code;
 		}
 	}
+	
 	public Response(){
 		
 	}
@@ -32,14 +38,16 @@ public class Response implements Sendable{
 	
 	public boolean prepared(){
 		buffer = setHeaders();
-		buffer.put(charSet.encode(content));
+		if(!headOnly){
+			buffer.put(body.prepared());
+		}
 		buffer.flip();
 		return true;
 	}
 	
 	private ByteBuffer setHeaders(){
 		CharBuffer chBuffer = CharBuffer.allocate(1024);
-		chBuffer.put("HTTP/1.1 ").put("200").put(CRLF)
+		chBuffer.put("HTTP/1.1 ").put(this.code+"").put(CRLF)
 				.put("Server: nioHttpServer").put(CRLF)
 				.put("Content-type: text").put(CRLF)
 				.put("Content-length:").put(content.length()+"").put(CRLF)
