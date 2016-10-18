@@ -17,6 +17,10 @@ public class RequestHandler implements Handler{
 	private Response response = null;
 	private boolean sent=false;//是否已发送response
 	
+	public RequestHandler(){
+		
+	}
+	
 	public RequestHandler(ChannelIo cio) throws Exception{
 		if(null == cio){
 			throw new Exception("ChannelIo cannot be null");
